@@ -1,0 +1,28 @@
+extends layout
+
+append javascripts
+  script(src="/erizo.js")
+  != js('messaging')
+  != js('p2p')
+  script().
+    $(document).ready(function() {
+      new oye.PeerToPeer(JSON.parse('!{auth}'), '!{room_id}');
+      new oye.MessageCourier(JSON.parse('!{auth}'), '!{room_id}');
+    });
+
+block content
+  div#rtc
+    div#rtc-top
+      div.mio
+        div.video
+          img(src="/video-placeholder.png" class="video-placeholder")
+
+    div#rtc-btm
+      div.amigo
+        div.video
+          img(src="/video-placeholder.png" class="video-placeholder")
+        a(href="#" class="fullscreen-btn") fullscreen
+
+  div#messages
+    include _send-message
+    div#mesg-recv

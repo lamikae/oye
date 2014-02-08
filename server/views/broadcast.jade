@@ -1,0 +1,22 @@
+extends layout
+
+append javascripts
+  script(src="/erizo.js")
+  != js('messaging')
+  != js('broadcast')
+  script().
+    $(document).ready(function() {
+      new oye.Broadcast(JSON.parse('!{auth}'), '!{room_id}');
+      new oye.MessageCourier(JSON.parse('!{auth}'), '!{room_id}');
+    });
+
+block content
+  div#rtc
+    div.broadcast
+      div.video
+        img(src="/video-placeholder.png" class="video-placeholder")
+      a(href="#" class="fullscreen-btn") fullscreen
+
+  div#messages
+    include _send-message
+    div#mesg-recv

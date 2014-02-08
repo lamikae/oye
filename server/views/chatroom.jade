@@ -1,0 +1,52 @@
+extends layout
+
+append javascripts
+  script(src="/erizo.js")
+  != js('messaging')
+  != js('chatroom')
+  script().
+    $(document).ready(function() {
+      new oye.Chatroom(JSON.parse('!{auth}'), '!{room_id}');
+      new oye.MessageCourier(JSON.parse('!{auth}'), '!{room_id}');
+    });
+
+block content
+
+  div#rtc
+    div#miniature.peers
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+      div.video.unchecked
+        img(src="/video-placeholder.png" class="video-placeholder")
+        div.username &nbsp;
+
+    div#share-options
+      input(type="checkbox" name="allowed" value=false)
+      label(name="allowed") Share video
+
+    div#messages(style="float: left")
+      include _send-message
+      div#mesg-recv
+
+    div#vga.peer
+      div.video
+        img(src="/video-placeholder.png" class="video-placeholder")
+      a(href="#" class="fullscreen-btn") fullscreen
+
+
