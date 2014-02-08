@@ -1,0 +1,6 @@
+node_modules
+npm-debug.log
+log/*
+vendor/licode/third_party/srtp/description-pak
+oye_config.js*
+licode_config.js*
