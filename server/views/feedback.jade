@@ -1,0 +1,20 @@
+extends layout
+
+append javascripts
+  != js('feedback')
+  != js('navigation')
+  script().
+    $(document).ready(function() {
+      new oye.Feedback();
+      new oye.Navigation();
+    });
+
+block content
+  include _navigation
+
+  div#feedback
+    p
+    | Should you wish to contact the author, you may do so with this form.
+    div
+      textarea(rows=20 cols=60 autofocus)
+    input(type="button" value="Send")

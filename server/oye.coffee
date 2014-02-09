@@ -128,6 +128,36 @@ exports.listen = (port) ->
       resp.send("Unauthorized", 401)
 
 
+  # Back to first room token allows
+  app.all("/square1", requireAuthentication)
+  app.get "/square1", (req, resp) ->
+    unless req.session.auth or req.session.auth.rooms
+      resp.redirect("/login")
+      return
+    for room_id in req.session.auth.rooms
+      db.rooms.findOne {_id: room_id}, (err, room) =>
+        resp.redirect("/room/#{room._id}")
+        return
+
+
+  # Feedback
+  app.get "/feedback", (req, resp) ->
+    if req.session.auth and req.session.auth.rooms
+      link = "/room/"+req.session.auth.rooms[0]
+    else
+      link = "#"
+    resp.render("feedback", {title: "Feedback form", chatroom_link: link})
+
+  app.post "/feedback", (req, resp) ->
+    entry = new Date() + ' -- ' + req.headers['x-forwarded-for'] + ' -- ' + req.headers['user-agent']
+    entry += "\n" + req.body.text
+    entry += "\n\n-----------------------------------------------\n\n"
+    fs.open 'feedback.txt', 'a', 0o0600, (e, id) ->
+      fs.write id, entry, null, 'utf8', ->
+        fs.close(id)
+    resp.send("OK")
+
+
   # Open HTTPS server
   if process.env.HTTPS == "1"
     https = require("https")
