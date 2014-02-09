@@ -1,0 +1,3 @@
+[submodule "vendor/licode"]
+	path = vendor/licode
+	url = https://github.com/lamikae/licode.git

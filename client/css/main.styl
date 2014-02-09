@@ -1,0 +1,130 @@
+@import 'nib'
+@import 'nib/gradients'
+
+*, *:before, *:after
+  -moz-box-sizing: border-box
+  -webkit-box-sizing: border-box
+  box-sizing: border-box
+
+body
+  background: #eaeaea
+  padding: 0
+  margin: 0
+
+input
+  margin: 0.2em
+  font-size: larger
+  font-family: monospace
+
+video
+  float: left
+
+span.username
+  color: #b487a5
+  margin: 0 0.4em
+
+span.message
+  color: #232
+
+#rtc
+  float: left
+
+#rtc-top, #rtc-btm
+  padding: 0.2em
+  float: none
+
+.video img
+  width: 640px
+  height: 480px
+
+.mio img
+  width: 128px
+  height: 96px
+
+.video .username
+  font-size: 0.8em
+  text-align: center
+  width: auto
+  font-weight: bold
+  padding: 0
+
+#miniature
+  overflow: auto
+
+#miniature .video
+  margin: 1em
+  float: left
+
+#miniature .video img
+  width: 128px
+  height: 96px
+
+#miniature .video-placeholder
+  width: inherit
+  height: inherit
+
+.peer#vga
+  overflow: auto
+
+.peer#vga img
+  width: 640px
+  height: 480px
+
+#share-options
+  padding-left: 1em
+  overflow: auto
+
+#share-options input
+  float: left
+
+#share-options label
+  float: left
+  padding: 0 0.5em
+  font-size: 1.2em
+
+#share-options label:hover
+  text-decoration: underline
+  cursor: pointer
+
+#messages
+  float: right
+  margin: 1em
+  padding: 0.4em
+  border: 3px double #327f7f
+  width: 32em
+  font-size: 1em
+
+#messages input
+  vertical-align: top
+
+#mesg-send
+  font-size: 1.5em
+  min-height: 1.5em
+  height: auto
+  max-width: 77%
+  width: auto
+  margin-left: 0.4em
+
+#message-sort-order
+  float: right
+  padding: 0
+  margin: 0
+  cursor: pointer
+
+#mesg-recv
+  max-height: 500px
+  overflow-y: scroll
+  background: linear-gradient(top, #dfdfdf, #afafaf, #e3e3e3, white)
+  background-repeat: no-repeat
+  background-size: 100% 100%
+  font-size: larger
+
+#feedback
+  overflow: auto
+  font-size: 1.2em
+  padding: 0.8em
+
+#feedback textarea
+  width: auto
+  font-size: 1.2em
+  margin: 0.4em 0

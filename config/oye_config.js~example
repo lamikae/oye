@@ -1,0 +1,32 @@
+var config = {};
+config.users = [
+  {name: "kwame", roles: ["presenter"]},
+  {name: "wheeler", roles: ["presenter"]},
+  {name: "linka", roles: ["presenter"]},
+  {name: "gi", roles: ["presenter"]},
+  {name: "ma-ti", roles: ["presenter"]},
+  {name: "guest", roles: ["guest", "presenter"]},
+  {name: "lurker", roles: ["guest", "viewer"]},
+];
+config.rooms = [
+  {_id: "webrtc-chat", jade: "chatroom", name: "Happy hacking day chat"},
+  {_id: "red", jade: "chatroom", name: "Red WebRTC conference"},
+  {_id: "orange", jade: "chatroom", name: "Orange WebRTC conference"},
+  {_id: "yellow", jade: "chatroom", name: "Yellow WebRTC conference"},
+  {_id: "green", jade: "chatroom", name: "Green WebRTC conference"},
+  {_id: "blue", jade: "p2p", p2p: true, name: "Blue WebRTC meet"},
+  {_id: "indigo", jade: "p2p", p2p: true, name: "Indigo WebRTC meet"},
+  {_id: "violet", jade: "p2p", p2p: true, name: "Violet WebRTC meet"},
+  {_id: "workshop", jade: "broadcast", name: "Workshop WebRTC broadcast"},
+];
+config.access_codes = [
+  {code: "oye", username: "guest", rooms: ["webrtc-chat"]},
+  {code: "workshop-master", username: "gi", rooms: ["workshop"]},
+  {code: "workshop", username: "lurker", rooms: ["workshop"]},
+  {code: "earth", username: "guest", rooms: ["red"]},
+  {code: "fire", username: "guest", rooms: ["orange"]},
+  {code: "wind", username: "guest", rooms: ["yellow"]},
+  {code: "water", username: "guest", rooms: ["green"]},
+  {code: "heart", username: "guest", rooms: ["indigo"]},
+];
+module.exports = config;
