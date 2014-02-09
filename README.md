@@ -48,6 +48,13 @@ After the script has run, copy the newly compiled erizo.js to the public directo
 cp /opt/share/licode/assets/erizo.js server/public
 ```
 
+You should also put node to your path
+
+```
+echo 'export PATH=/opt/node/bin:$PATH' >> ~/.bashrc
+```
+
+
 ### Node dependencies
 
 Install the main application node dependencies.
