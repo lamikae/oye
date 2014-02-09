@@ -97,7 +97,17 @@ class oye.MessageCourier
 
 
   connect = (auth, room_id) =>
-    socket = io.connect(":443/", {resource: "messaging.io", secure: true})
+    secure = (document.location.protocol == 'https:')
+    if secure
+      url = ":443/"
+      socket = io.connect(url, {
+        resource: "messaging.io",
+        secure: secure})
+    else
+      url = ":3004/"
+      socket = io.connect(url, {
+        resource: "socket.io",
+        secure: secure})
     socket.emit "authenticate", auth
     me = auth.username
     socket.emit "join", room_id, me

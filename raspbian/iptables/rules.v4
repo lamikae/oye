@@ -33,11 +33,11 @@
 ##
 #
 
-# Oye 3004, ErizoController 8080, not allowed
--A INPUT -p tcp --sport 3004 -j REJECT
--A INPUT -p tcp --dport 3004 -j REJECT
--A OUTPUT -p tcp --sport 3004 -j REJECT
--A OUTPUT -p tcp --dport 3004 -j REJECT
+# Oye 3004 allowed, ErizoController 8080, not allowed
+-A INPUT -p tcp --sport 3004 -j ACCEPT
+-A INPUT -p tcp --dport 3004 -j ACCEPT
+-A OUTPUT -p tcp --sport 3004 -j ACCEPT
+-A OUTPUT -p tcp --dport 3004 -j ACCEPT
 -A INPUT -p tcp --sport 8080 -j REJECT
 -A INPUT -p tcp --dport 8080 -j REJECT
 -A OUTPUT -p tcp --sport 8080 -j REJECT
