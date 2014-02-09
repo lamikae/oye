@@ -1,1 +1,178 @@
-hello world
+<!doctype html>
+<head>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+  <div id="bg-layer"></div>
+  <div>
+    <div id="banner">
+      <img src="assets/images/oye.png" alt="">
+      <div class="banner-title">
+
+        Oye
+
+      </div>
+      <div class="banner-brief">
+<em>Open source WebRTC stack</em>
+      </div>
+      <div class="banner-source">
+        <a href="https://github.com/lamikae/oye">
+          View the source code on Github
+        </a>
+      </div>
+    </div>
+
+  <p></p>
+
+    <div>
+      <article>
+        <div class="article-head">
+          <img src="assets/images/WebRTC-tilt.png" alt="">
+          <p class="article-title">
+
+          </p>
+        </div>
+        <div class="article-text">
+In supported web browsers, WebRTC may access your camera and microphone. This media stream can be displayed on a html5 video element <em>and sent to other browsers for viewing</em>.
+<ul>
+  <li><a href="http://www.webrtc.org/">webrtc.org</a></li>
+  <li><a href="http://caniuse.com/#search=webrtc">caniuse.com/#search=webrtc</a></li>
+</ul>
+To discover each other, peers need a central hub to coordinate.
+
+        </div>
+      </article>
+
+
+      <article>
+        <div class="article-head">
+          <img src="assets/images/bitard.jpg" alt="">
+          <p class="article-title">
+            Oye is a modest WebRTC hub
+          </p>
+        </div>
+        <p class="article-text">
+Oye is intended for you to take and repurpose for your needs. The AGPL license kindly asks you to give back the changes you feel others might find useful.
+<br>
+The engine of Oye is patched <a href="https://github.com/lamikae/licode">fork of Licode</a>. They provide a solid base and upstream that keeps track of changes in the spec.
+
+        </p>
+      </article>
+
+      <article>
+        <div class="article-head">
+          <!-- <img src="assets/images/1896_telephone.jpg" alt=""> -->
+          <!-- <img src="assets/images/kite.png" alt=""> -->
+          <p class="article-title">
+Operation modes
+          </p>
+        </div>
+        <div class="article-text">
+
+<div>
+  <img src="assets/images/broadcast.png">
+  <img src="assets/images/broadcast-p2p.png">
+</div>
+<div>broadcast</div>
+
+
+<div>
+  <img src="assets/images/chatroom.png">
+  <img src="assets/images/chatroom-p2p.png">
+</div>
+<div>chatroom</div>
+
+
+<div>
+  <img src="assets/images/p2p.png">
+</div>
+<div>peer to peer</div>
+
+
+        </div>
+      </article>
+
+
+
+      <article>
+        <div class="article-head">
+          <img src="assets/images/raspberry.jpg" alt="">
+
+          <div class="article-title">
+            Raspbian form-factor
+          </div>
+        </div>
+        <p class="article-text">
+The licode codebase is patched to <em>scale down</em> to run on Raspberry Pi for the benefit of reduced footprint.
+        </p>
+      </article>
+
+
+
+      <article>
+        <div class="article-head">
+          <img src="assets/images/th.jpg" class="small" alt="">
+
+          <p class="article-title">
+A bit wary on all this cloud business?
+          </p>
+        </div>
+        <p class="article-text">
+Q: What strange "cloud technologies" are necessary to run all this? How do I know what they are doing?
+<br><br>
+A: Nginx and three node.js processes on the server. An install script for Debian GNU/Linux based systems is provided, and what apt-get cannot provide, is built from source code. There are no proprietary components.
+<br><br>
+Q: Node.js? It must be very slow then.
+<br><br>
+A: Only the higher level control logic is Javascript. The core modules are written in C++.
+<br><br>
+Q: What browsers and operating systems are supported?
+<br><br>
+A: Client browsers may be running on a variety of Linux, Windows and OSX hosts. Not all mixtures may work at all times though. Currently Firefox, Chrome and Opera have integrated features of WebRTC.
+<br><br>
+Q: Where's the catch?
+<br><br>
+A: You still need <em>a STUN server...</em>
+
+
+        </p>
+      </article>
+
+
+      <article>
+        <div class="article-head">
+          <img src="assets/images/tesla.jpg" alt="" class="bordered">
+
+          <p class="article-title">
+STUN what?
+          </p>
+        </div>
+        <p class="article-text">
+
+The Oye system is <em>self-contained</em>; once installed, it does not require resources from the internet if all peers are within the same local network.
+<br><br>
+To connect with peers on the internet, a STUN server is needed for public ip discovery. Oye does not yet have this feature, and you may consider using the default google server to lookup your ip address.
+        </p>
+      </article>
+
+
+      <article>
+        <div class="article-head">
+          <!-- <img src="assets/images/collegues.jpg" alt=""> -->
+          <img src="assets/images/1896_telephone.jpg" alt="">
+
+          <div class="article-title">
+            Get started
+          </div>
+        </div>
+        <p class="article-text">
+See the <a href="#">README</a> for installation instructions.
+        </p>
+      </article>
+
+
+    </div>
+    <div id="footer"></div>
+  </div>
+</body>
+</html>
