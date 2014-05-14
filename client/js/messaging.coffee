@@ -23,6 +23,7 @@ class oye.MessageCourier
   roomId = null
   me = null
   timezoneOffset = 0
+  incomingMessageFX = null
 
   constructor: (auth, room_id) ->
     # Get current timezone offset from UTC (minutes)
@@ -83,6 +84,22 @@ class oye.MessageCourier
             data("order", "ASC")
             reverseMessages("ASC")
 
+    # incoming message audio
+    incomingMessageFX = $("#mesg-fx")[0]
+    # audio file is hard-coded to template.
+    # chromium on linux does not play dynamic sources?
+    # if incomingMessageFX
+    #   incomingMessageFX.src = "/assets/recv-msg.wav"
+
+    $("#message-mute").on "click", (e) ->
+      el = event.currentTarget
+      if $(incomingMessageFX).data("muted") == "true"
+        el.src = "/assets/unmute.png"
+        $(incomingMessageFX).data("muted", "false")
+      else
+        el.src = "/assets/mute.png"
+        $(incomingMessageFX).data("muted", "true")
+
 
   connect = (auth, room_id) =>
     secure = (document.location.protocol == 'https:')
@@ -114,6 +131,8 @@ class oye.MessageCourier
 
     socket.on "message-receive", (timestamp, username, message) ->
       showMessage(timestamp, username, message)
+      if incomingMessageFX
+        incomingMessageFX.play()
 
 
   showMessage = (timestamp, username, message) ->
