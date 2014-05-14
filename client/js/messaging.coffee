@@ -26,25 +26,21 @@ class oye.MessageCourier
   constructor: (auth, room_id) ->
     # If user is a guest, he is asked to choose a username.
     if auth.roles.indexOf("guest") == -1
-      # User known, connect to server
+      # Connect to websocket server
       connect(auth, room_id)
     else
-      # User should first select a username
+      # We entirely trust the user and pass no checks on the
+      # username validity and availability.
+      # The new username is used to login to the room.
       enterUsername = (username) ->
-        return unless username
-        # The user has chosen a username.
-        # We entirely trust the user and pass no checks on the
-        # username validity and availability.
-        # The new username is now overwritten to guest auth data.
         auth.username = username
         connect(auth, room_id)
-
-      $("#choose-username").show()
       $("#username-chosen").on "keypress", (e) ->
         if e.keyCode == 13
           enterUsername(e.currentTarget.value)
       $("#username-button").on "click", (e) ->
         enterUsername($("#username-chosen")[0].value)
+      $("#choose-username").show()
 
 
     # Pressing enter key will send the text when element is text input.
@@ -53,11 +49,11 @@ class oye.MessageCourier
     $("#mesg-send").on "keypress", (e) ->
       if e.keyCode == 13
         eName = e.currentTarget.nodeName
-        if (eName == "TEXTAREA" && e.shiftKey) or eName == "INPUT"
+        if eName == "INPUT" or (e.shiftKey && eName == "TEXTAREA")
+          e.preventDefault()
           text = e.currentTarget.value
           return if text == ""
           if sendMessage(text)
-            e.preventDefault()
             e.currentTarget.value = ""
 
     $("#mesg-button").on "click", (e) ->
@@ -81,19 +77,6 @@ class oye.MessageCourier
           $(el).
             data("order", "ASC")
             reverseMessages("ASC")
-
-
-  reverseMessages = (order) ->
-    fragment = document.createDocumentFragment()
-    parent = $("#mesg-recv")
-    parent.children("div").each (idx, el) ->
-      $(fragment).prepend(el)
-    parent.html("")
-    parent.append(fragment.cloneNode(true))
-    if order == "DESC"
-      parent.scrollTop(0)
-    else
-      parent.scrollTop(parent[0].scrollHeight)
 
 
   connect = (auth, room_id) =>
@@ -163,4 +146,17 @@ class oye.MessageCourier
       msg = message.replace(/\n/g, '<br>&nbsp;&nbsp;')
       div.innerHTML += "<span class='message'>#{msg}</span>"
     return div
+
+
+  reverseMessages = (order) ->
+    fragment = document.createDocumentFragment()
+    parent = $("#mesg-recv")
+    parent.children("div").each (idx, el) ->
+      $(fragment).prepend(el)
+    parent.html("")
+    parent.append(fragment.cloneNode(true))
+    if order == "DESC"
+      parent.scrollTop(0)
+    else
+      parent.scrollTop(parent[0].scrollHeight)
 
