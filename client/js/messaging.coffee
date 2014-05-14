@@ -90,8 +90,7 @@ class oye.MessageCourier
     # chromium on linux does not play dynamic sources?
     # if incomingMessageFX
     #   incomingMessageFX.src = "/assets/recv-msg.wav"
-
-    $("#message-mute").on "click", (e) ->
+    $("#message-mute").on "click", (event) ->
       el = event.currentTarget
       if $(incomingMessageFX).data("muted") == "true"
         el.src = "/assets/unmute.png"
@@ -128,10 +127,13 @@ class oye.MessageCourier
 
     socket.on "notice", (timestamp, username, message) ->
       showMessage(timestamp, username, message)
+      if incomingMessageFX
+        # audio fx for notices is played even if incoming msg is muted
+        incomingMessageFX.play()
 
     socket.on "message-receive", (timestamp, username, message) ->
       showMessage(timestamp, username, message)
-      if incomingMessageFX
+      if incomingMessageFX && $(incomingMessageFX).data("muted") != "true"
         incomingMessageFX.play()
 
 
