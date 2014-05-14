@@ -22,8 +22,13 @@ class oye.MessageCourier
   socket = null
   roomId = null
   me = null
+  timezoneOffset = 0
 
   constructor: (auth, room_id) ->
+    # Get current timezone offset from UTC (minutes)
+    d = new Date()
+    timezoneOffset = d.getTimezoneOffset()
+
     # If user is a guest, he is asked to choose a username.
     if auth.roles.indexOf("guest") == -1
       # Connect to websocket server
@@ -141,7 +146,7 @@ class oye.MessageCourier
   formatMessage = (timestamp, username, message) =>
     div = document.createElement "div"
     if timestamp
-      div.innerHTML += "<span class='timestamp'>[#{timestamp}]</span>&nbsp;"
+      div.innerHTML += "<span class='timestamp'>[#{formatTime(timestamp)}]</span>&nbsp;"
     if username
       div.innerHTML += "<span class='username'>&lt; #{username}&gt;</span>&nbsp;"
     if message
@@ -162,3 +167,13 @@ class oye.MessageCourier
     else
       parent.scrollTop(parent[0].scrollHeight)
 
+
+  # Time in hh:mm format from timestamp with current timezone offset.
+  formatTime = (timestamp) ->
+    timestamp -= timezoneOffset
+    minutes = timestamp % 60
+    hours = Math.floor((timestamp/60) % 60)
+    return pad(hours) + ":" + pad(minutes)
+
+
+  pad = (number) -> `(number < 10) ? "0"+number : number`
