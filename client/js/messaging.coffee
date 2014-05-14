@@ -104,16 +104,16 @@ class oye.MessageCourier
           $("#choose-username").hide()
           $("#send-message").show()
 
-    socket.on "notice", (message, username) ->
-      showMessage(message, username)
+    socket.on "notice", (timestamp, username, message) ->
+      showMessage(timestamp, username, message)
 
-    socket.on "message-receive", (message, username) ->
-      showMessage(message, username)
+    socket.on "message-receive", (timestamp, username, message) ->
+      showMessage(timestamp, username, message)
 
 
-  showMessage = (message, username) ->
+  showMessage = (timestamp, username, message) ->
     div = $("#mesg-recv")
-    msghtml = formatMessage(message, username)
+    msghtml = formatMessage(timestamp, username, message)
     if $("#message-sort-order").data("order") == "DESC"
       div.prepend(msghtml)
       div.scrollTop(0)
@@ -138,8 +138,10 @@ class oye.MessageCourier
       console.log err
 
 
-  formatMessage = (message, username) =>
+  formatMessage = (timestamp, username, message) =>
     div = document.createElement "div"
+    if timestamp
+      div.innerHTML += "<span class='timestamp'>[#{timestamp}]</span>&nbsp;"
     if username
       div.innerHTML += "<span class='username'>&lt; #{username}&gt;</span>&nbsp;"
     if message

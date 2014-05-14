@@ -213,7 +213,7 @@ exports.messageCourier.listen = (server, options) =>
           room.sockets ||= []
           # broadcast message to all in channel
           for sock in room.sockets
-            sock.emit('notice', "#{username} joined")
+            sock.emit('notice', timeNow(), null, "#{username} joined")
           # add socket to room
           room.sockets.push(socket)
           # ack join to socket
@@ -226,6 +226,7 @@ exports.messageCourier.listen = (server, options) =>
     socket.on 'mesg-send', (room_id, message, username) =>
       # Socket must be authorized to send or receive messages
       return unless socket.authorized
+      timestamp = timeNow()
       try
         db.rooms.findOne {_id: room_id}, (err, room) =>
           if err
@@ -237,10 +238,20 @@ exports.messageCourier.listen = (server, options) =>
             # console.log "DEBUG: message from #{username} to", room._id
             # broadcast message to all in channel
             for sock in room.sockets
-              sock.emit('message-receive', message, username)
-            return
+              sock.emit('message-receive', timestamp, username, message)
           else
             console.log "INFO: socket not in room #{room_id}"
       catch err
         console.log "WARNING: error processing incoming message:", err
 
+
+  timeNow = ->
+    d = new Date()
+    return pad(d.getHours()) + ":" + pad(d.getMinutes())
+
+
+  pad = (number) ->
+    if number < 10
+      return "0" + number
+    else
+      return number
