@@ -1,10 +1,7 @@
 # Introduction
 
-Thank you for your interest in Oye, the modest WebRTC hub.
-
-These are the install notes to build the server stack on Debian GNU/Linux.
-
-You can run this also on a Raspberry Pi using the Raspbian distribution.
+Thank you for your interest in Oye.
+These notes walk you through installing a modest personal WebRTC stack on Debian GNU/Linux.
 
 
 # Install build dependencies
@@ -12,13 +9,13 @@ You can run this also on a Raspberry Pi using the Raspbian distribution.
 
 ## Clone the main repository
 
-The raspbian stack install script defaults to install libraries to `/opt/share/licode`, this readme uses `/opt/oye`.
-All the following commands are intended to be run in this directory.
-
 ```
-git clone https://github.com/lamikae/oye.git /opt/oye
+git clone --recursive https://github.com/lamikae/oye.git /opt/oye
 cd /opt/oye
-git submodule init
+```
+
+Licode submodule must be kept updated if not tracked automatically.
+```
 git submodule update
 ```
 
@@ -28,49 +25,31 @@ git submodule update
 Let's go through the steps it takes to build the software stack from a clean install.
 
 
-### Raspbian script
+### Raspbian stack
 
-You may not be a fan of monolithic install scripts, but here we have one yet again. If you don't want the script to install node.js from source, you need to install node beforehand. The default install location for the script will be /opt/node; add `/opt/node/bin` to your PATH variable.
+The stack command will install a load of dependencies on Debian GNU/Linux derivatives. Some packages are from apt repositories, while some are compiled from sources and bundled into deb packages for the system package manager to index.
 
-```
-vendor/licode/scripts/installRaspbianStack.sh
-```
-
-It is called "Raspbian" because the script installs MongoDB-less and RabbitMQ-less software stack. It runs on various flavors of Debian GNU/Linux.
-
-Running the script may take a while enough to have coffee or a good night's sleep, depending on your current mood and setup.
-
-The script asks `sudo` multiple times to install built packages.
-
-After the script has run, copy the newly compiled erizo.js to the public directory:
+Include path to node binary in your global $PATH:
 
 ```
-cp /opt/share/licode/assets/erizo.js server/public
+echo -e "\nexport PATH=/opt/node/bin:$PATH" >> ~/.bashrc
+source ~/.bashrc
 ```
 
-You should also put node to your path
+This will install MongoDB-less and RabbitMQ-less software stack.
+It may take a while. The script will ask for `sudo` to install debian packages into the system.
 
 ```
-echo 'export PATH=/opt/node/bin:$PATH' >> ~/.bashrc
+make stack
 ```
 
-
-### Node dependencies
-
-Install the main application node dependencies.
-
-```
-npm install
-```
-
-### Create your certificate
-
-You may consider creating your own certificate to `raspbian/cert`.
+NOTE: npm may fail to install all dependencies. Read the error message and try again a few times and the issue might be solved.
 
 
-### Development build
 
-After initial installation, you may use the Makefile to compile licode targets instead of running the full install script again. There is no need for you to do this unless you intend on modifying the source code.
+### Build licode
+
+Compile licode to ensure you have the latest build.
 
 ```
 make licode
@@ -79,17 +58,15 @@ make licode
 
 ### Setup nginx and iptables rules
 
-Nginx is required for full https protection, as browsers tend to ignore encrypted websockets going into different originating ports while using self-signed certificates. This is why nginx is setup to reroute backend websockets to the same port.
+Nginx is the HTTP(S) frontend for all backend services.
 
-Port 8080 is a websocket port for erizo.js <-> ErizoController communication. Port 3004 serves both http and socket.io, while port 3000 is entirely for internal Nuve <-> ErizoController communication. Cloud software can be tricky at times. None of these ports need to be open to the internet once they are proxied by nginx.
+Port 8080 is a websocket port for erizo.js <-> ErizoController communication. Port 3004 serves both http and socket.io, while port 3000 is entirely for internal Nuve <-> ErizoController communication. None of these ports need to be open to the internet once they are proxied by nginx.
 
-The WebRTC streams are packed in sRTP packets that are transmitted over in high UDP ports. Proxy setups have not been tested, and they might turn out to be complicated.
+The WebRTC streams travel in sRTP packets at high UDP ports. Proxy setups  might turn out to be complicated.
 
-A suggested nginx configuration and a set of iptables firewall rules are provided in the repository. If you installed nginx via the install script, or your nginx resides in `/opt/nginx/`, and `/etc/iptables/` seem like a good place to keep rules, then the defaults are fine.
+TL:DR; nginx is required for encrypted websockets. Nginx configuration and a set of iptables firewall rules are provided in the repository.
 
-TL:DR; nginx is required for encrypted websockets.
-
-NOTE: if you're on ssh on other port than default 22, you should check the iptables rules `raspbian/iptables/rules.v4` before reloading the rules to not lock yourself out.
+NOTE: if you're on ssh on other port than default 22, you should check the iptables rules `raspbian/iptables/rules.v4` before reloading the rules **not to lock yourself out**.
 
 ```
 sudo make services iptables nginx
@@ -97,17 +74,70 @@ sudo service nginx start
 ```
 
 
+### Create your certificate
+
+You may consider creating your own certificate to `raspbian/cert`.
+
+
 ## Configure
 
-Copy the examples in place and have a look inside, at least for having the demo access codes.
+Copy and edit the example configuration files.
 
 ```
 cd config
-cp licode_config.js~example licode_config.js
 cp oye_config.js~example oye_config.js
+cp licode_config.js~example licode_config.js
 ```
 
-Here are the interesting technical bits you may find interesting.
+
+### Users
+
+Users are simple creatures; they have a name and some roles. The roles map directly to nuve roles set in licode_config.
+
+```
+{name: "gaucho", roles: ["presenter"]},
+{name: "amigo",  roles: ["viewer"]},
+```
+
+User roles have more meaning than the username. To send and receive video, user must have the "presenter" role, and to only receive, "viewer" is sufficient. An extra role, "guest", exists so that the user can choose his or her username when he enters a room.
+
+
+### Rooms
+
+Rooms are PeerConnection gathering places. Peers in the same room exchange ICE candidates, and ErizoController handles the offer-answer procedure required for streams to establish. In p2p mode the UDP streams travel literally peer-to-peer, not passing through ErizoController.
+
+Room objects map directly to Nuve rooms. They accept "p2p" and "data" Nuve attributes.
+
+
+#### Broadcast
+
+You may wish to broadcast a stream from a webcam to an audience.
+The stream travels through ErizoController rebroadcast for connected peers.
+
+```
+{_id: "stadium", jade: "broadcast", p2p: false},
+```
+
+
+#### Peer to peer
+
+In this setup the sRTP UDP packet streams travel directly to their destination.
+
+```
+{_id: "custerdome", jade: "p2p", p2p: true},
+```
+
+
+### Access codes
+
+Access codes bind users to rooms. A single code can grant access to multiple rooms, and the user is redirected to the first one. **All token codes must be unique!**
+
+```
+{code: "defr", username: "gaucho", rooms: ["stadium"]},
+{code: "gthy", username: "amigo",  rooms: ["stadium"]},
+{code: "r4t5", username: "gaucho", rooms: ["custerdome"]},
+{code: "vfbg", username: "amigo",  rooms: ["custerdome"]},
+```
 
 
 ### STUN server
@@ -131,61 +161,6 @@ Leaving `config.erizo.stunserver` empty, client browsers are left on their own t
 ```
 config.erizo.stunserver = '';
 config.erizo.stunport = 0;
-```
-
-
-### Users
-
-Users are simple creatures; they have a name and some roles. The roles map directly to nuve roles set in licode_config.
-
-```
-{name: "gaucho", roles: ["presenter"]},
-{name: "amigo",  roles: ["viewer"]},
-```
-
-User roles have more meaning than the username. To send and receive video, user must have the "presenter" role, and to only receive, "viewer" is sufficient. An extra role, "guest", exists so that the user can choose his or her username when he enters a room.
-
-
-### Rooms
-
-Rooms are PeerConnection gathering places. Peers in the same room exchange ICE candidates, and ErizoController handles the offer-answer procedure required for streams to establish. In p2p mode the UDP streams travel literally peer-to-peer, not passing through ErizoController.
-
-Room objects map directly to Nuve rooms. They accept "p2p" and "data" Nuve attributes.
-
-
-#### Workshop example
-
-You may wish to broadcast a stream from a webcam to an audience, but the actual device has a limited bandwidth, but your server can handle the load.
-
-```
-{_id: "workshop", jade: "broadcast", p2p: false},
-```
-
-This setting takes the network strain off the device with the input devices; the stream goes to the ErizoController to rebroadcast for connected peers.
-
-
-#### Private call example
-
-The opposite is a peer-to-peer connection. Your sRTP UDP packet stream will travel directly to its destination and not take a bypass through the server.
-
-```
-{_id: "custerdome", jade: "p2p", p2p: true},
-```
-
-
-### Access codes
-
-You have to create access codes for the rooms.
-This is the only authentication mechanism in place.
-A code is given for a user and is valid for some rooms.
-The user is redirected to the room first in the room list. To help user reach the desired page with the code, it can be advised to create multiple codes for single rooms.
-All token codes must be unique! This is a humble, modest hub.
-
-```
-{code: "defr", username: "gaucho", rooms: ["workshop"]},
-{code: "gthy", username: "amigo",  rooms: ["workshop"]},
-{code: "r4t5", username: "gaucho", rooms: ["custerdome"]},
-{code: "vfbg", username: "amigo",  rooms: ["custerdome"]},
 ```
 
 

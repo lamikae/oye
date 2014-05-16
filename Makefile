@@ -9,17 +9,20 @@ LICODE_SRCDIR     := $(MY_DIR)/vendor/licode
 LICODE_LIBDIR     := /opt/share/licode/lib
 NODEJS_BINDIR     := /opt/node/bin
 
-all: licode
-licode: erizo nuve
+licode: nuve erizo
 	# LIST
 	@du -h \
 		$(LICODE_LIBDIR)/nuve.js \
 		$(LICODE_LIBDIR)/liberizo.so \
 		$(LICODE_LIBDIR)/erizoAPI/* \
 		$(ASSETS_DIR)/erizo*.js
-build: all
 nuve: nuve.js
 erizo: liberizo.so erizoAPI erizo.js
+build: all
+all: licode
+stack:
+	@npm install
+	@./vendor/licode/scripts/installRaspbianStack.sh
 
 # # #
 
