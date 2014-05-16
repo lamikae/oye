@@ -79,6 +79,11 @@ runNuve:
 	@echo " * Start Nuve"
 	@# Remove unix sockets from previous run
 	@-rm -f /tmp/nuve*.sock
+	@# Create missing licode_config.js symlink
+	@if [ ! -e $(LICODE_SRCDIR)/licode_config.js ]; then \
+		config_file="`pwd`/config/licode_config.js" && \
+		cd $(LICODE_SRCDIR) && ln -s "$${config_file}" . ; \
+	fi
 	export LD_LIBRARY_PATH=$(LICODE_LIBDIR) && \
 	export PATH=$(NODEJS_BINDIR):$$PATH && \
 	cd $(LICODE_SRCDIR)/nuve/nuveAPI && \
