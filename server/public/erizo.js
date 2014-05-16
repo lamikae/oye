@@ -2992,7 +2992,6 @@ Erizo.ChromeCanaryStack = function(spec) {
           sessionDescription.sdp = setMaxBW(sessionDescription.sdp);
           L.Logger.debug("Changed", sessionDescription.sdp);
           var newOffer = sessionDescription.sdp;
-          var newOffer = sessionDescription.sdp;
           if(newOffer !== that.prevOffer) {
             that.peerConnection.setLocalDescription(sessionDescription);
             that.state = "preparing-offer";
@@ -3111,7 +3110,7 @@ Erizo.Connection = function(spec) {
       that.browser = "mozilla";
       that = Erizo.FirefoxStack(spec)
     }else {
-      if(window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] <= 32) {
+      if(window.navigator.appVersion.match(/Chrome\/([\w\W]*?)\./)[1] <= 33) {
         L.Logger.debug("Stable!");
         that = Erizo.ChromeStableStack(spec);
         that.browser = "chrome-stable"
@@ -3224,6 +3223,7 @@ Erizo.Stream = function(spec) {
     }
   };
   that.play = function(elementID, options) {
+    options = options || {};
     that.elementID = elementID;
     if(that.hasVideo() || this.hasScreen()) {
       if(elementID !== undefined) {
@@ -3341,7 +3341,8 @@ Erizo.Room = function(spec) {
   connectSocket = function(token, callback, error) {
     var host = "https://" + token.host;
     delete io.sockets[host];
-    that.socket = io.connect(token.host, {log:true, reconnect:true, secure:true, resource:"erizo.io"});
+    var secure = document.location.protocol == "https:";
+    that.socket = io.connect("/", {log:true, reconnect:true, secure:secure, resource:"erizo.io"});
     that.socket.on("onAddStream", function(arg) {
       var stream = Erizo.Stream({streamID:arg.id, local:false, audio:arg.audio, video:arg.video, data:arg.data, screen:arg.screen, attributes:arg.attributes}), evt;
       that.remoteStreams[arg.id] = stream;
@@ -3892,6 +3893,259 @@ L.Base64 = function(L) {
   };
   return{encodeBase64:encodeBase64, decodeBase64:decodeBase64}
 }(L);
+(function() {
+  this.L = this.L || {};
+  this.L.ElementQueries = function() {
+    function getEmSize(element) {
+      if(!element) {
+        element = document.documentElement
+      }
+      var fontSize = getComputedStyle(element, "fontSize");
+      return parseFloat(fontSize) || 16
+    }
+    function convertToPx(element, value) {
+      var units = value.replace(/[0-9]*/, "");
+      value = parseFloat(value);
+      switch(units) {
+        case "px":
+          return value;
+        case "em":
+          return value * getEmSize(element);
+        case "rem":
+          return value * getEmSize();
+        case "vw":
+          return value * document.documentElement.clientWidth / 100;
+        case "vh":
+          return value * document.documentElement.clientHeight / 100;
+        case "vmin":
+        ;
+        case "vmax":
+          var vw = document.documentElement.clientWidth / 100;
+          var vh = document.documentElement.clientHeight / 100;
+          var chooser = Math[units === "vmin" ? "min" : "max"];
+          return value * chooser(vw, vh);
+        default:
+          return value
+      }
+    }
+    function SetupInformation(element) {
+      this.element = element;
+      this.options = [];
+      var i, j, option, width = 0, height = 0, value, actualValue, attrValues, attrValue, attrName;
+      this.addOption = function(option) {
+        this.options.push(option)
+      };
+      var attributes = ["min-width", "min-height", "max-width", "max-height"];
+      this.call = function() {
+        width = this.element.offsetWidth;
+        height = this.element.offsetHeight;
+        attrValues = {};
+        for(i = 0, j = this.options.length;i < j;i++) {
+          option = this.options[i];
+          value = convertToPx(this.element, option.value);
+          actualValue = option.property == "width" ? width : height;
+          attrName = option.mode + "-" + option.property;
+          attrValue = "";
+          if(option.mode == "min" && actualValue >= value) {
+            attrValue += option.value
+          }
+          if(option.mode == "max" && actualValue <= value) {
+            attrValue += option.value
+          }
+          if(!attrValues[attrName]) {
+            attrValues[attrName] = ""
+          }
+          if(attrValue && -1 === (" " + attrValues[attrName] + " ").indexOf(" " + attrValue + " ")) {
+            attrValues[attrName] += " " + attrValue
+          }
+        }
+        for(var k in attributes) {
+          if(attrValues[attributes[k]]) {
+            this.element.setAttribute(attributes[k], attrValues[attributes[k]].substr(1))
+          }else {
+            this.element.removeAttribute(attributes[k])
+          }
+        }
+      }
+    }
+    function setupElement(element, options) {
+      if(element.elementQueriesSetupInformation) {
+        element.elementQueriesSetupInformation.addOption(options)
+      }else {
+        element.elementQueriesSetupInformation = new SetupInformation(element);
+        element.elementQueriesSetupInformation.addOption(options);
+        new ResizeSensor(element, function() {
+          element.elementQueriesSetupInformation.call()
+        })
+      }
+      element.elementQueriesSetupInformation.call()
+    }
+    function queueQuery(selector, mode, property, value) {
+      var query;
+      if(document.querySelectorAll) {
+        query = document.querySelectorAll.bind(document)
+      }
+      if(!query && "undefined" !== typeof $$) {
+        query = $$
+      }
+      if(!query && "undefined" !== typeof jQuery) {
+        query = jQuery
+      }
+      if(!query) {
+        throw"No document.querySelectorAll, jQuery or Mootools's $$ found.";
+      }
+      var elements = query(selector);
+      for(var i = 0, j = elements.length;i < j;i++) {
+        setupElement(elements[i], {mode:mode, property:property, value:value})
+      }
+    }
+    var regex = /,?([^,\n]*)\[[\s\t]*(min|max)-(width|height)[\s\t]*[~$\^]?=[\s\t]*"([^"]*)"[\s\t]*]([^\n\s\{]*)/mgi;
+    function extractQuery(css) {
+      var match;
+      css = css.replace(/'/g, '"');
+      while(null !== (match = regex.exec(css))) {
+        if(5 < match.length) {
+          queueQuery(match[1] || match[5], match[2], match[3], match[4])
+        }
+      }
+    }
+    function readRules(rules) {
+      var selector = "";
+      if(!rules) {
+        return
+      }
+      if("string" === typeof rules) {
+        rules = rules.toLowerCase();
+        if(-1 !== rules.indexOf("min-width") || -1 !== rules.indexOf("max-width")) {
+          extractQuery(rules)
+        }
+      }else {
+        for(var i = 0, j = rules.length;i < j;i++) {
+          if(1 === rules[i].type) {
+            selector = rules[i].selectorText || rules[i].cssText;
+            if(-1 !== selector.indexOf("min-height") || -1 !== selector.indexOf("max-height")) {
+              extractQuery(selector)
+            }else {
+              if(-1 !== selector.indexOf("min-width") || -1 !== selector.indexOf("max-width")) {
+                extractQuery(selector)
+              }
+            }
+          }else {
+            if(4 === rules[i].type) {
+              readRules(rules[i].cssRules || rules[i].rules)
+            }
+          }
+        }
+      }
+    }
+    this.init = function() {
+      for(var i = 0, j = document.styleSheets.length;i < j;i++) {
+        readRules(document.styleSheets[i].cssText || document.styleSheets[i].cssRules || document.styleSheets[i].rules)
+      }
+    }
+  };
+  function init() {
+    (new L.ElementQueries).init()
+  }
+  if(window.addEventListener) {
+    window.addEventListener("load", init, false)
+  }else {
+    window.attachEvent("onload", init)
+  }
+  this.L.ResizeSensor = function(element, callback) {
+    function addResizeListener(element, callback) {
+      if(window.OverflowEvent) {
+        element.addEventListener("overflowchanged", function(e) {
+          callback.call(this, e)
+        })
+      }else {
+        element.addEventListener("overflow", function(e) {
+          callback.call(this, e)
+        });
+        element.addEventListener("underflow", function(e) {
+          callback.call(this, e)
+        })
+      }
+    }
+    function EventQueue() {
+      this.q = [];
+      this.add = function(ev) {
+        this.q.push(ev)
+      };
+      var i, j;
+      this.call = function() {
+        for(i = 0, j = this.q.length;i < j;i++) {
+          this.q[i].call()
+        }
+      }
+    }
+    function getComputedStyle(element, prop) {
+      if(element.currentStyle) {
+        return element.currentStyle[prop]
+      }else {
+        if(window.getComputedStyle) {
+          return window.getComputedStyle(element, null).getPropertyValue(prop)
+        }else {
+          return element.style[prop]
+        }
+      }
+    }
+    function attachResizeEvent(element, resized) {
+      if(!element.resizedAttached) {
+        element.resizedAttached = new EventQueue;
+        element.resizedAttached.add(resized)
+      }else {
+        if(element.resizedAttached) {
+          element.resizedAttached.add(resized);
+          return
+        }
+      }
+      var myResized = function() {
+        if(setupSensor()) {
+          element.resizedAttached.call()
+        }
+      };
+      element.resizeSensor = document.createElement("div");
+      element.resizeSensor.className = "resize-sensor";
+      var style = "position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: -1;";
+      element.resizeSensor.style.cssText = style;
+      element.resizeSensor.innerHTML = '<div class="resize-sensor-overflow" style="' + style + '">' + "<div></div>" + "</div>" + '<div class="resize-sensor-underflow" style="' + style + '">' + "<div></div>" + "</div>";
+      element.appendChild(element.resizeSensor);
+      if("absolute" !== getComputedStyle(element, "position")) {
+        element.style.position = "relative"
+      }
+      var x = -1, y = -1, firstStyle = element.resizeSensor.firstElementChild.firstChild.style, lastStyle = element.resizeSensor.lastElementChild.firstChild.style;
+      function setupSensor() {
+        var change = false, width = element.resizeSensor.offsetWidth, height = element.resizeSensor.offsetHeight;
+        if(x != width) {
+          firstStyle.width = width - 1 + "px";
+          lastStyle.width = width + 1 + "px";
+          change = true;
+          x = width
+        }
+        if(y != height) {
+          firstStyle.height = height - 1 + "px";
+          lastStyle.height = height + 1 + "px";
+          change = true;
+          y = height
+        }
+        return change
+      }
+      setupSensor();
+      addResizeListener(element.resizeSensor, myResized);
+      addResizeListener(element.resizeSensor.firstElementChild, myResized);
+      addResizeListener(element.resizeSensor.lastElementChild, myResized)
+    }
+    if("array" === typeof element || "undefined" !== typeof jQuery && element instanceof jQuery || "undefined" !== typeof Elements && element instanceof Elements) {
+      var i = 0, j = element.length;
+      for(;i < j;i++) {
+        attachResizeEvent(element[i], callback)
+      }
+    }else {
+      attachResizeEvent(element, callback)
+    }
+  }
+})();
 var Erizo = Erizo || {};
 Erizo.View = function(spec) {
   var that = Erizo.EventDispatcher({});
@@ -3912,8 +4166,40 @@ Erizo.VideoPlayer = function(spec) {
   };
   that.destroy = function() {
     that.video.pause();
-    clearInterval(that.resize);
+    delete that.resizer;
     that.parentNode.removeChild(that.div)
+  };
+  that.resize = function() {
+    var width = that.container.offsetWidth, height = that.container.offsetHeight;
+    if(spec.stream.screen || spec.options.crop === false) {
+      if(width * (3 / 4) < height) {
+        that.video.style.width = width + "px";
+        that.video.style.height = 3 / 4 * width + "px";
+        that.video.style.top = -(3 / 4 * width / 2 - height / 2) + "px";
+        that.video.style.left = "0px"
+      }else {
+        that.video.style.height = height + "px";
+        that.video.style.width = 4 / 3 * height + "px";
+        that.video.style.left = -(4 / 3 * height / 2 - width / 2) + "px";
+        that.video.style.top = "0px"
+      }
+    }else {
+      if(width !== that.containerWidth || height !== that.containerHeight) {
+        if(width * (3 / 4) > height) {
+          that.video.style.width = width + "px";
+          that.video.style.height = 3 / 4 * width + "px";
+          that.video.style.top = -(3 / 4 * width / 2 - height / 2) + "px";
+          that.video.style.left = "0px"
+        }else {
+          that.video.style.height = height + "px";
+          that.video.style.width = 4 / 3 * height + "px";
+          that.video.style.left = -(4 / 3 * height / 2 - width / 2) + "px";
+          that.video.style.top = "0px"
+        }
+      }
+    }
+    that.containerWidth = width;
+    that.containerHeight = height
   };
   L.Logger.debug("Creating URL from stream " + that.stream);
   var myURL = window.URL || webkitURL;
@@ -3932,9 +4218,6 @@ Erizo.VideoPlayer = function(spec) {
   if(spec.stream.local) {
     that.video.volume = 0
   }
-  if(spec.stream.local) {
-    that.video.volume = 0
-  }
   if(that.elementID !== undefined) {
     document.getElementById(that.elementID).appendChild(that.div);
     that.container = document.getElementById(that.elementID)
@@ -3947,38 +4230,8 @@ Erizo.VideoPlayer = function(spec) {
   that.div.appendChild(that.video);
   that.containerWidth = 0;
   that.containerHeight = 0;
-  that.resize = setInterval(function() {
-    var width = that.container.offsetWidth, height = that.container.offsetHeight;
-    if(!spec.stream.screen) {
-      if(width !== that.containerWidth || height !== that.containerHeight) {
-        if(width * (3 / 4) > height) {
-          that.video.style.width = width + "px";
-          that.video.style.height = 3 / 4 * width + "px";
-          that.video.style.top = -(3 / 4 * width / 2 - height / 2) + "px";
-          that.video.style.left = "0px"
-        }else {
-          that.video.style.height = height + "px";
-          that.video.style.width = 4 / 3 * height + "px";
-          that.video.style.left = -(4 / 3 * height / 2 - width / 2) + "px";
-          that.video.style.top = "0px"
-        }
-      }
-    }else {
-      if(width * (3 / 4) < height) {
-        that.video.style.width = width + "px";
-        that.video.style.height = 3 / 4 * width + "px";
-        that.video.style.top = -(3 / 4 * width / 2 - height / 2) + "px";
-        that.video.style.left = "0px"
-      }else {
-        that.video.style.height = height + "px";
-        that.video.style.width = 4 / 3 * height + "px";
-        that.video.style.left = -(4 / 3 * height / 2 - width / 2) + "px";
-        that.video.style.top = "0px"
-      }
-    }
-    that.containerWidth = width;
-    that.containerHeight = height
-  }, 500);
+  that.resizer = new L.ResizeSensor(that.container, that.resize);
+  that.resize();
   that.bar = new Erizo.Bar({elementID:"player_" + that.id, id:that.id, stream:spec.stream, media:that.video, options:spec.options});
   that.div.onmouseover = onmouseover;
   that.div.onmouseout = onmouseout;
@@ -4099,6 +4352,7 @@ Erizo.Speaker = function(spec) {
     that.picker.max = 100;
     that.picker.step = 10;
     that.picker.value = lastVolume;
+    that.picker.orient = "vertical";
     that.div.appendChild(that.picker);
     that.media.volume = that.picker.value / 100;
     that.picker.oninput = function(evt) {
