@@ -41,6 +41,10 @@ class oye.MessageCourier
       enterUsername = (username) ->
         auth.username = username
         connect(auth, room_id)
+        $("#choose-username").hide()
+        $("#send-message").show()
+        $("#mesg-send")[0].focus()
+
       $("#username-chosen").on "keypress", (e) ->
         if e.keyCode == 13
           enterUsername(e.currentTarget.value)
@@ -122,8 +126,6 @@ class oye.MessageCourier
         if room_id_ == room_id
           roomId = room_id_
           # console.log("Connected to chatroom", roomId)
-          $("#choose-username").hide()
-          $("#send-message").show()
 
     socket.on "notice", (timestamp, username, message) ->
       showMessage(timestamp, username, message)
