@@ -66,9 +66,9 @@ Oye is <em>not a service</em>, it is a WebRTC server-client stack.
         <p class="article-text">
 
 Oye establishes communication between two or more peers in a same "room".
-Clients do not need to install any software or plugin if they are using a supported browser. All they need is an url and an access code. The access code grants the peer a role and adds it to a "room".
+All clients need a compatible browser, no other software or plugin need to be installed. A url to the server along with an access code is sufficient to grant peers access to rooms.
 <br><br>
-Rooms can be configured to be "peer-to-peer", and the server simply shares the session with the clients that are in the room. A room can also relay all traffic through the server.
+A room shares a WebRTC session with connected clients. Session data streams can be configured to flow "peer-to-peer"; traffic can also be relayed through the server.
 
         </p>
       </article>
@@ -120,17 +120,16 @@ Rooms can be configured to be "peer-to-peer", and the server simply shares the s
 
           <p class="article-text">
 
-Oye is based on <a href="https://github.com/lamikae/licode">patched fork</a> of  <a href="http://lynckia.com/">Licode</a>. The upstream provides a solid base that keeps track of changes in the spec.
+Oye is based on <a href="https://github.com/lamikae/licode">patched fork</a> of  <a href="http://lynckia.com/">Licode</a>. That is a solid, active codebase.
 
-Oye fronts the web with Nginx and runs three node.js processes on the server.
-Only the higher level control logic is Javascript, core modules are written in C++.
+Oye fronts the web with Nginx and runs three Node.js processes on the server.
+Only the higher level control logic is JavaScript, core modules are written in C++.
 There are no proprietary components.
 
 <br><br>
-Install script for Debian GNU/Linux based systems is provided, and what apt-get cannot provide, is built from source code. Clone the repo and <a href="https://github.com/lamikae/oye/blob/master/README.md">follow the readme</a>.
+An automated install script for Debian GNU/Linux server stack is provided. Clone the repo and <a href="https://github.com/lamikae/oye/blob/master/README.md">follow the readme</a>.
 <br><br>
-Firefox, Chrome and Opera browsers on Linux, Windows and OSX hosts have been working. All combinations may not work at all times, as browsers keep pushing new releases, and the WebRTC spec is not yet "finished".
-
+Current stable releases of Firefox, Chrome/Chromium and Opera browsers on GNU/Linux, Windows and Mac OS X clients have built-in support.
 
 </p>
         </div>
@@ -149,7 +148,7 @@ The Oye system is <em>self-contained</em>; once installed, it does not require r
 
 <br><br>
 
-To connect with peers on the internet, a STUN server is needed for public ip discovery. Oye does not yet have this feature, and defaults to using a public GTalk server to lookup the ip on both the server and the clients. <!-- Block Google, and Oye will fail to work. --> Sorry.
+To connect with peers on the internet, a STUN server is needed for public ip discovery. Oye does not yet have this feature, and defaults to using a public GTalk server to lookup the ip on both the server and the clients. <!-- Block Google, and Oye will fail to work. -->
 
 
 
@@ -167,10 +166,9 @@ To connect with peers on the internet, a STUN server is needed for public ip dis
 
           <img src="assets/images/raspberry.jpg" alt="" class="sidepanel">
 <p class="article-text">
-Inter-process communication is arranged using RPC over unix sockets. Upstream Licode uses AMQP for this purpose, but in Oye fork the RabbitMQ dependency is dropped to reduce complexity.
+Inter-process communication is arranged using RPC over unix sockets. Licode upstream uses AMQP for this purpose, but Oye drops this RabbitMQ dependency to reduce complexity.
 
-MongoDB persistence layer is also removed to empower Raspberry Pi host platform. Thus <em>Oye doesn't scale</em> with provided backend. Licode upstream architecture <em>is</em> web-scale.
-
+MongoDB persistence layer is also removed to empower Raspberry Pi host platforms. Therefore <em>Oye doesn't scale</em> with the default backend. (Licode upstream architecture <em>is</em> web-scale.)
 
         </p>
       </article>
@@ -178,7 +176,7 @@ MongoDB persistence layer is also removed to empower Raspberry Pi host platform.
       <article>
         <div class="article-head">
           <!-- <img src="assets/images/collegues.jpg" alt=""> -->
-          <img src="assets/images/th.jpg" class="small" alt="">
+          <img src="assets/images/th.jpg" class="small" alt="" style="margin-right: 100px">
 
 
           <div class="article-title">
