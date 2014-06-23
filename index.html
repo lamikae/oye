@@ -4,24 +4,25 @@
   <link rel="stylesheet" href="assets/css/main.css">
   <meta name="robots" content="noindex, nofollow">
   <meta name="googlebot" content="nosnippet, noarchive">
-  <title>Oye</title>
+  <title>Oye video conference platform</title>
 </head>
 <body>
   <div id="bg-layer"></div>
   <div>
     <div id="banner">
-      <img src="assets/images/oye.png" alt="">
+      <img src="assets/images/oye.png" alt="" class="logo">
       <div class="banner-title">
 
         Oye
 
       </div>
       <div class="banner-brief">
-<em>Open source WebRTC stack</em>
+        <em>Free software WebRTC conference platform </em>
       </div>
       <div class="banner-source">
         <a href="https://github.com/lamikae/oye">
-          View the source code on Github
+          <!-- Source code hosted on Github -->
+          <img class="github-banner" src="assets/images/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
         </a>
       </div>
     </div>
@@ -34,15 +35,20 @@
           <img src="assets/images/WebRTC-tilt.png" alt="">
           <p class="article-title">
 
+<!-- webrtc -->
+
           </p>
         </div>
         <div class="article-text">
-In supported web browsers, WebRTC may access your camera and microphone. This media stream can be displayed on a html5 video element <em>and sent to other browsers for viewing</em>.
+
+Oye provides real-time video, audio and text channel between web browsers.
+Oye is <em>not a service</em>, it is a WebRTC server-client stack.
+
 <ul>
   <li><a href="http://www.webrtc.org/">webrtc.org</a></li>
   <li><a href="http://caniuse.com/#search=webrtc">caniuse.com/#search=webrtc</a></li>
 </ul>
-To discover each other, peers need a central hub to coordinate.
+
 
         </div>
       </article>
@@ -52,125 +58,139 @@ To discover each other, peers need a central hub to coordinate.
         <div class="article-head">
           <img src="assets/images/bitard.jpg" alt="">
           <p class="article-title">
-            Oye is a modest WebRTC hub
+
+<!-- oye is for you tinkerer -->
+
           </p>
         </div>
         <p class="article-text">
-Oye is intended for you to take and repurpose for your needs. The AGPL license kindly asks you to give back the changes you feel others might find useful.
-<br>
-The engine of Oye is patched <a href="https://github.com/lamikae/licode">fork of Licode</a>. They provide a solid base and upstream that keeps track of changes in the spec.
+
+Oye establishes communication between two or more peers in a same "room".
+Clients do not need to install any software or plugin if they are using a supported browser. All they need is an url and an access code. The access code grants the peer a role and adds it to a "room".
+<br><br>
+Rooms can be configured to be "peer-to-peer", and the server simply shares the session with the clients that are in the room. A room can also relay all traffic through the server.
 
         </p>
       </article>
 
       <article>
         <div class="article-head">
-          <!-- <img src="assets/images/1896_telephone.jpg" alt=""> -->
-          <!-- <img src="assets/images/kite.png" alt=""> -->
+          <img src="assets/images/1896_telephone.jpg" alt="">
           <p class="article-title">
-Operation modes
+<!-- Operation modes -->
           </p>
         </div>
         <div class="article-text">
 
+<div>peer to peer</div>
+<div>
+  <img src="assets/images/p2p.png">
+</div>
+
+<hr>
+
+<div>broadcast - one to many</div>
 <div>
   <img src="assets/images/broadcast.png">
   <img src="assets/images/broadcast-p2p.png">
 </div>
-<div>broadcast</div>
+
+<hr>
 
 
+<div>chatroom - many to many</div>
 <div>
   <img src="assets/images/chatroom.png">
   <img src="assets/images/chatroom-p2p.png">
 </div>
-<div>chatroom</div>
-
-
-<div>
-  <img src="assets/images/p2p.png">
-</div>
-<div>peer to peer</div>
-
 
         </div>
       </article>
 
 
-
       <article>
         <div class="article-head">
-          <img src="assets/images/raspberry.jpg" alt="">
+<!--           <img src="assets/images/tesla.jpg" alt="" class="bordered sidepanel"> -->
+          <img src="assets/images/kite.png" alt="">
 
-          <div class="article-title">
-            Raspbian form-factor
-          </div>
-        </div>
-        <p class="article-text">
-The licode codebase is patched to <em>scale down</em> to run on Raspberry Pi for the benefit of reduced footprint.
-        </p>
-      </article>
-
-
-
-      <article>
-        <div class="article-head">
-          <img src="assets/images/th.jpg" class="small" alt="">
 
           <p class="article-title">
-What's with all the cloud huh?
+<!-- technical bits -->
           </p>
+
+          <p class="article-text">
+
+Oye is based on <a href="https://github.com/lamikae/licode">patched fork</a> of  <a href="http://lynckia.com/">Licode</a>. The upstream provides a solid base that keeps track of changes in the spec.
+
+Oye fronts the web with Nginx and runs three node.js processes on the server.
+Only the higher level control logic is Javascript, core modules are written in C++.
+There are no proprietary components.
+
+<br><br>
+Install script for Debian GNU/Linux based systems is provided, and what apt-get cannot provide, is built from source code. Clone the repo and <a href="https://github.com/lamikae/oye/blob/master/README.md">follow the readme</a>.
+<br><br>
+Firefox, Chrome and Opera browsers on Linux, Windows and OSX hosts have been working. All combinations may not work at all times, as browsers keep pushing new releases, and the WebRTC spec is not yet "finished".
+
+
+</p>
         </div>
-        <p class="article-text">
-Q: What strange "cloud technologies" are necessary to run all this? How do I know what they are doing?
-<br><br>
-A: Nginx and three node.js processes on the server. An install script for Debian GNU/Linux based systems is provided, and what apt-get cannot provide, is built from source code. There are no proprietary components.
-<br><br>
-Q: Node.js? It must be very slow then.
-<br><br>
-A: Only the higher level control logic is Javascript. The core modules are written in C++.
-<br><br>
-Q: What browsers and operating systems are supported?
-<br><br>
-A: Client browsers may be running on a variety of Linux, Windows and OSX hosts. Not all mixtures may work at all times though. Currently Firefox, Chrome and Opera have integrated features of WebRTC.
-<br><br>
-Q: Where's the catch?
-<br><br>
-A: You still need <em>a STUN server...</em>
-
-
-        </p>
       </article>
 
 
       <article>
         <div class="article-head">
-          <img src="assets/images/tesla.jpg" alt="" class="bordered">
+          <img src="assets/images/tesla.jpg" alt="" class="bordered sidepanel">
 
-          <p class="article-title">
-STUN what?
-          </p>
-        </div>
-        <p class="article-text">
 
+
+<p class="article-text">
+Oye is cloud software but can operate also "off the grid" disconnected from the internet.
 The Oye system is <em>self-contained</em>; once installed, it does not require resources from the internet if all peers are within the same local network.
+
 <br><br>
-To connect with peers on the internet, a STUN server is needed for public ip discovery. Oye does not yet have this feature, and you may consider using the default google server to lookup your ip address.
-        </p>
+
+To connect with peers on the internet, a STUN server is needed for public ip discovery. Oye does not yet have this feature, and defaults to using a public GTalk server to lookup the ip on both the server and the clients. <!-- Block Google, and Oye will fail to work. --> Sorry.
+
+
+
+</p>
+
+
+
+
+        </div>
       </article>
 
+
+      <article>
+        <div class="article-head">
+
+          <img src="assets/images/raspberry.jpg" alt="" class="sidepanel">
+<p class="article-text">
+Inter-process communication is arranged using RPC over unix sockets. Upstream Licode uses AMQP for this purpose, but in Oye fork the RabbitMQ dependency is dropped to reduce complexity.
+
+MongoDB persistence layer is also removed to empower Raspberry Pi host platform. Thus <em>Oye doesn't scale</em> with provided backend. Licode upstream architecture <em>is</em> web-scale.
+
+
+        </p>
+      </article>
 
       <article>
         <div class="article-head">
           <!-- <img src="assets/images/collegues.jpg" alt=""> -->
-          <img src="assets/images/1896_telephone.jpg" alt="">
+          <img src="assets/images/th.jpg" class="small" alt="">
+
 
           <div class="article-title">
-            Get started
+            <!-- Get started -->
           </div>
         </div>
         <p class="article-text">
-See the <a href="https://github.com/lamikae/oye/blob/master/README.md">README</a> for installation instructions.
+
+Oye is <em>not a service</em>.
+There is no public server to test Oye live.
+<br>
+Follow the <a href="https://github.com/lamikae/oye/blob/master/README.md">README</a> for installation instructions.
         </p>
       </article>
 
