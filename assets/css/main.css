@@ -9,7 +9,6 @@ body {
     margin: 0;
     padding: 0;
     background: #fff;
-    background: linear-gradient(to bottom, #fcfcfc, #fff);
 }
 #banner {
     float: none;
@@ -58,7 +57,13 @@ article {
     overflow: auto;
     /*vertical-align: top;*/
 }
-article img, .sidepanel  {
+article img {
+    padding: 0;
+    margin: 0.5em 1em;
+    width: 28%;
+    max-width: 30%;
+}
+img.sidepanel  {
     float: right;
     padding: 0;
     margin: 0em 1em;
