@@ -121,7 +121,7 @@ A room shares a WebRTC session with connected clients. Session data streams can 
 
         <p class="article-text">
 
-Oye is based on <a href="https://github.com/lamikae/licode">patched fork</a> of  <a href="http://lynckia.com/">Licode</a>. That is a solid, active codebase.
+Oye is based on <a href="https://github.com/lamikae/licode">a fork</a> of  <a href="http://lynckia.com/">Licode</a>. Licode upstream is a solid, active codebase.
 
 Oye fronts the web with Nginx and runs three Node.js processes on the server.
 Only the higher level control logic is JavaScript, core modules are written in C++.
@@ -164,7 +164,7 @@ To connect with peers on the internet, a STUN server is needed for public ip dis
 
 Inter-process communication is arranged using RPC over unix sockets. Licode upstream uses AMQP for this purpose, but Oye drops this RabbitMQ dependency to reduce complexity.
 
-MongoDB persistence layer is also removed to empower Raspberry Pi host platforms. Therefore <em>Oye doesn't scale</em> with the default backend. (Licode upstream architecture <em>is</em> web-scale.)
+MongoDB persistence layer is also removed to empower <span class="raspi">Raspberry Pi</span> host platforms. Therefore <em>Oye doesn't scale</em> with the default backend. (Licode upstream architecture <em>is</em> web-scale.)
 
         </p>
       </article>
